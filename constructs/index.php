@@ -1,69 +1,39 @@
 <?php
 
-// Parent Class
-// This class should not be instantiated because it
-// serves as the base class. This is possible by adding the `abstract`
-// keyword
-
-abstract class AchievementType
+// An interface is like a class without behaviour
+interface Newsletter
 {
-    public function name()
-    {
-        // Get the name of the class without any namespace prefix
-        $class = (new ReflectionClass($this))->getShortName();
-
-        // E.g. FirstThousandPoints => First Thousand Points
-        // Replace every occurrence of a capital letter with a space
-        // followed by the letter
-
-        return trim(preg_replace('/[A-Z]/', ' $0', $class));
-    }
-
-    public function icon()
-    {
-        // Get the name from the `name` method
-        // Replace every space with a '-' and append '.png' and make it lowercase
-
-        return strtolower(str_replace(' ', '-', $this->name() . '.png'));
-
-    }
-
-    // `abstract`, meaning providing a 'signature'. That's why the method
-    // has no body and why it will be required of any subclass to use.
-    // Abstract methods needs specifics from the subclass calling it.
-    abstract public function qualifier($user);
+    public function subscribe($email);
 }
 
-class FirstThousandPoints extends AchievementType
+class CampaignMonitor implements Newsletter
 {
-
-    public function qualifier($user)
+    public function subscribe($email)
     {
-
+        die('Subscribing with CampaignMonitor');
     }
 }
 
-class FirstBestAnswer extends AchievementType
+class Drip implements Newsletter
 {
-
-    public function qualifier($user)
+    public function subscribe($email)
     {
-
+        die('Subscribing with Drip');
     }
 }
 
-class ReachTop50 extends AchievementType
+// The controller should only care about the `subscribe` method
+// and not be bothered with the implementation, be it Drip or CampaignMonitor
+class NewsletterSubscriptionsController
 {
 
-    public function qualifier($user)
+    public function store(Newsletter $newsletter)
     {
-
+        $email = 'joe@example.com';
+        $newsletter->subscribe($email);
     }
+
 }
 
-// We always instantiate a subclass and not a parent class
-$achievement = new ReachTop50();
-
-echo $achievement->name();
-echo "\n";
-echo $achievement->icon();
+$controller = new NewsletterSubscriptionsController();
+$controller->store(new CampaignMonitor());
