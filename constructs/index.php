@@ -1,79 +1,69 @@
 <?php
 
-class Team
+// Parent Class
+// This class should not be instantiated because it
+// serves as the base class. This is possible by adding the `abstract`
+// keyword
+
+abstract class AchievementType
 {
-    protected $name;
-    protected $members = [];
-
-    /**
-     * @param $name
-     * @param array $members
-     */
-    public function __construct($name, $members = [])
-    {
-        $this->name = $name;
-        $this->members = $members;
-    }
-
-    // Destructuring
-    // Accepts a variable number of arguments which will be accessible as an array
-    public static function start(...$params)
-    {
-        return new static(...$params);
-    }
-
     public function name()
     {
-        return $this->name;
+        // Get the name of the class without any namespace prefix
+        $class = (new ReflectionClass($this))->getShortName();
+
+        // E.g. FirstThousandPoints => First Thousand Points
+        // Replace every occurrence of a capital letter with a space
+        // followed by the letter
+
+        return trim(preg_replace('/[A-Z]/', ' $0', $class));
     }
 
-    public function members()
+    public function icon()
     {
-        return $this->members;
-    }
+        // Get the name from the `name` method
+        // Replace every space with a '-' and append '.png' and make it lowercase
 
-    public function add($name)
-    {
-        $this->members[] = $name;
-    }
-
-    public function cancel()
-    {
+        return strtolower(str_replace(' ', '-', $this->name() . '.png'));
 
     }
 
-    public function manager()
-    {
-
-    }
+    // `abstract`, meaning providing a 'signature'. That's why the method
+    // has no body and why it will be required of any subclass to use.
+    // Abstract methods needs specifics from the subclass calling it.
+    abstract public function qualifier($user);
 }
 
-class Member
+class FirstThousandPoints extends AchievementType
 {
-    protected $name;
 
-    /**
-     * @param $name
-     */
-
-    // Now we have a dedicated place to put member specific information
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
-
-    public function lastViewed()
+    public function qualifier($user)
     {
 
     }
-
 }
 
-$acme2 = Team::start('Acme', [
-   // We no longer pass a parameter but instead a full object
-    new Member('John Doe'),
-    new Member('Jane Doe'),
-]);
+class FirstBestAnswer extends AchievementType
+{
 
-// We now get an array of member objects
-var_dump($acme2->members());
+    public function qualifier($user)
+    {
+
+    }
+}
+
+class ReachTop50 extends AchievementType
+{
+
+    public function qualifier($user)
+    {
+
+    }
+}
+
+// We always instantiate a subclass and not a parent class
+$achievement = new ReachTop50();
+
+echo $achievement->name();
+echo "\n";
+echo $achievement->icon();
